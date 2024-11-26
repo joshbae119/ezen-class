@@ -1,11 +1,16 @@
 package com.springbook.biz.controller;
 
 import java.io.IOException;
+import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import com.springbook.biz.board.BoardVO;
+import com.springbook.biz.board.impl.BoardDAO;
 import com.springbook.biz.user.UserVO;
 import com.springbook.biz.user.impl.UserDAO;
 
@@ -39,23 +44,96 @@ public class DispatcherServelet extends HttpServlet {
 			UserVO user		=	userDAO.getUser(vo);
 
 			if(user != null){
-				response.sendRedirect("getBoardList.jsp");
+				response.sendRedirect("getBoardList.do");
 			}else{
 				response.sendRedirect("login.jsp");
 			}
 
 		}else if (path.equals("/logout.do")) {
 			System.out.println("로그아웃 처리");
+			
+			HttpSession session = request.getSession();
+			session.invalidate();
+			
+			response.sendRedirect("login.jsp");
+			
 		}else if (path.equals("/insertBoard.do")) {
 			System.out.println("글등록 처리");
+			
+			request.setCharacterEncoding("EUC-KR");
+			String title = request.getParameter("title");
+			String writer = request.getParameter("writer");
+			String content = request.getParameter("content");
+
+			BoardVO vo = new BoardVO();
+			vo.setTitle(title);
+			vo.setWriter(writer);
+			vo.setContent(content);
+
+			BoardDAO boardDAO = new BoardDAO();
+			boardDAO.insertBoard(vo);
+
+			response.sendRedirect("getBoardList.do");
+			
 		}else if (path.equals("/updateBoard.do")) {
 			System.out.println("글 수정 처리");
+			
+			request.setCharacterEncoding("EUC-KR");
+			String title =   request.getParameter("title");
+			String content = request.getParameter("content");
+			String seq = request.getParameter("seq");
+
+			BoardVO vo = new BoardVO();
+			vo.setTitle(title);
+			vo.setContent(content);
+			vo.setSeq(Integer.parseInt(seq));
+
+			BoardDAO boardDAO = new BoardDAO();
+			boardDAO.updateBoard(vo);
+
+			response.sendRedirect("getBoardList.do");
+
+			
+			
 		}else if (path.equals("/deleteBoard.do")) {
 			System.out.println("글 삭제 처리");
+			
+			String seq = request.getParameter("seq");
+
+			BoardVO vo = new BoardVO();
+			vo.setSeq(Integer.parseInt(seq));
+
+			BoardDAO boardDAO = new BoardDAO();
+			boardDAO.deleteBoard(vo);
+
+			response.sendRedirect("getBoardList.do");
+			
 		}else if (path.equals("/getBoard.do")) {
 			System.out.println("글 상세 보기 처리");
+			
+			String seq =  request.getParameter("seq");
+
+			BoardVO vo = new BoardVO();
+			vo.setSeq(Integer.parseInt(seq));
+			
+			BoardDAO boardDAO = new BoardDAO();
+		    BoardVO board =   boardDAO.getBoard(vo);
+		    
+			HttpSession session = request.getSession();
+			session.setAttribute("board", board);
+			response.sendRedirect("getBoard.jsp");
+
+			
 		}else if (path.equals("/getBoardList.do")) {
 			System.out.println("글 목록 보기 처리");
+			
+		    BoardVO vo = new BoardVO();
+			BoardDAO boardDAO = new BoardDAO();
+			List<BoardVO> boardList = boardDAO.getBoardList(vo);
+			
+			HttpSession session = request.getSession();
+			session.setAttribute("boardList", boardList);
+			response.sendRedirect("getBoardList.jsp");
 		}
 
 	}

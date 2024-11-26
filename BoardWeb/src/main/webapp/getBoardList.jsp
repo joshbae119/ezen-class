@@ -4,9 +4,8 @@
 <%@page import="com.springbook.biz.board.impl.BoardDAO" %>
 <%@page import="com.springbook.biz.board.BoardVO" %>
 <%
-    BoardVO vo = new BoardVO();
-	BoardDAO boardDAO = new BoardDAO();
-	List<BoardVO> boardList = boardDAO.getBoardList(vo);  
+	List<BoardVO> boardList= (List) session.getAttribute("boardList");
+
 %>
 <!DOCTYPE html>
 <html>
@@ -17,7 +16,7 @@
 <body>
 <center>
 <h1>글 목록</h1>
-<h3> 환영합니다 <a href="logout_proc.jsp">로그아웃</a></h3>
+<h3> 환영합니다 <a href="logout.do">로그아웃</a></h3>
 
 	<table border="1" cellpadding="0" cellspacing="0" width="700">
 		<tr>
@@ -31,7 +30,7 @@
 	<% for(BoardVO board : boardList) { %>
 	<tr>
 	  <td><%= board.getSeq() %></td>
-	  <td align="left"><a href="getBoard.jsp?seq=<%= board.getSeq() %>">
+	  <td align="left"><a href="getBoard.do?seq=<%= board.getSeq() %>">
 	  <%= board.getTitle() %></a></td>
 	  <td><%= board.getWriter() %></td>
 	  <td><%= board.getRegDate() %></td>
